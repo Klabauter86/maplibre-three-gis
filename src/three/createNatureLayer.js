@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import maplibregl from 'maplibre-gl';
+import * as maplibregl from 'maplibre-gl';
 
 const DEG2RAD = Math.PI / 180;
 
