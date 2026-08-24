@@ -1,7 +1,5 @@
 import './styles.css';
 import { createMap } from './map/createMap.js';
-import { createDemoNatureData, loadGeoJSON } from './geodata/demoData.js';
-import { createNatureLayer } from './three/createNatureLayer.js';
 import { createStatus } from './ui/status.js';
 
 const status = createStatus();
@@ -29,32 +27,14 @@ try {
   status.set(`Startfehler: ${errorMessage(error)}`, 'error');
 }
 
-async function getNatureData() {
-  try {
-    const dataUrl = `${import.meta.env.BASE_URL}data/example.geojson`;
-    const external = await loadGeoJSON(dataUrl);
-    if (external?.features?.length) return external;
-  } catch (error) {
-    console.warn(error);
-  }
-  return createDemoNatureData();
-}
-
-async function initialize3D() {
-  try {
-    status.set('Kartenstil geladen · erzeuge Vegetation …');
-    const data = await getNatureData();
-    map.addLayer(createNatureLayer({ data, status }));
-  } catch (error) {
-    console.error(error);
-    status.set(`3D-Fehler: ${errorMessage(error)}`, 'error');
-  }
+function markMapReady() {
+  status.set('MapLibre-Terrain bereit', 'ready');
 }
 
 if (map?.isStyleLoaded()) {
-  initialize3D();
+  markMapReady();
 } else {
-  map?.once('style.load', initialize3D);
+  map?.once('style.load', markMapReady);
 }
 
 map?.on('error', (event) => {
