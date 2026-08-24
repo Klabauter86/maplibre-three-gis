@@ -23,19 +23,19 @@ const map = new maplibregl.Map({
       },
       terrainSource: {
         type: 'raster-dem',
-        tiles: ['https://tiles.mapterhorn.com/{z}/{x}/{y}.webp'],
-        tileSize: 512,
+        tiles: ['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],
+        tileSize: 256,
         encoding: 'terrarium',
-        maxzoom: 17,
-        attribution: 'Terrain: Mapterhorn',
+        maxzoom: 15,
+        attribution: 'Terrain: AWS Open Data',
       },
       hillshadeSource: {
         type: 'raster-dem',
-        tiles: ['https://tiles.mapterhorn.com/{z}/{x}/{y}.webp'],
-        tileSize: 512,
+        tiles: ['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],
+        tileSize: 256,
         encoding: 'terrarium',
-        maxzoom: 17,
-        attribution: 'Terrain: Mapterhorn',
+        maxzoom: 15,
+        attribution: 'Terrain: AWS Open Data',
       },
     },
     layers: [
@@ -52,13 +52,9 @@ const map = new maplibregl.Map({
         paint: { 'hillshade-shadow-color': '#473B24' },
       },
     ],
-    terrain: {
-      source: 'terrainSource',
-      exaggeration: 1,
-    },
     sky: {},
   },
-  maxZoom: 17,
+  maxZoom: 18,
   maxPitch: 85,
 });
 
@@ -73,11 +69,12 @@ map.addControl(
 map.addControl(
   new maplibregl.TerrainControl({
     source: 'terrainSource',
-    exaggeration: 1,
+    exaggeration: 1.5,
   }),
 );
 
 map.on('load', () => {
+  map.setTerrain({ source: 'terrainSource', exaggeration: 1.5 });
   status.set('MapLibre 3D-Terrain bereit', 'ready');
 });
 
