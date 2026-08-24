@@ -5,6 +5,11 @@ import { createStatus } from './ui/status.js';
 
 const status = createStatus();
 
+// Vite bundles MapLibre into the application chunk. Point MapLibre at the
+// separately copied module worker so its relative shared-module import stays
+// valid on GitHub Pages as well as in local development.
+maplibregl.setWorkerUrl(`${import.meta.env.BASE_URL}maplibre-gl-worker.mjs`);
+
 const map = new maplibregl.Map({
   container: 'map',
   zoom: 12,
