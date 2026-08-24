@@ -5,7 +5,7 @@ Starter project for a browser-based 3D GIS / landscape application using MapLibr
 ## Current baseline
 
 - OpenStreetMap raster basemap
-- AWS Terrain Tiles (Terrarium DEM)
+- Mapterhorn terrain tiles (`raster-dem`)
 - MapLibre `raster-dem` terrain + hillshade
 - Three.js inside a MapLibre custom 3D layer using the same WebGL context
 - Terrain-aware placement via `queryTerrainElevation()`
