@@ -1,12 +1,14 @@
-# MapLibre Terrain GIS
+# MapLibre 3D Terrain
 
-Browserbasierte Terrain-Karte mit MapLibre GL JS und Vite.
+Neu aufgesetzte MapLibre-only-Terrainkarte auf Basis des offiziellen
+[MapLibre-3D-Terrain-Beispiels](https://maplibre.org/maplibre-gl-js/docs/examples/3d-terrain/).
 
 ## Current baseline
 
-- OpenStreetMap raster basemap
-- Mapterhorn terrain tiles (`raster-dem`)
-- MapLibre `raster-dem` terrain + hillshade
+- OpenStreetMap-Rasterkarte
+- getrennte Mapterhorn-Quellen für Terrain und Hillshade
+- MapLibre `terrain`, `hillshade`, Himmel und Terrain-Control
+- URL-Hash für Position, Zoom, Neigung und Drehung
 - Vite development/build setup
 - GitHub Codespaces/devcontainer port forwarding for port 5173
 
@@ -36,9 +38,6 @@ npm run preview
 
 ```text
 src/
-├── map/
-│   ├── config.js
-│   └── createMap.js
 ├── ui/
 │   └── status.js
 ├── main.js
