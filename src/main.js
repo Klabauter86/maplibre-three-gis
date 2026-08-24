@@ -1,43 +1,80 @@
 import './styles.css';
-import { createMap } from './map/createMap.js';
+import * as maplibregl from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
 import { createStatus } from './ui/status.js';
 
 const status = createStatus();
 
-function errorMessage(error) {
-  return error?.message ?? String(error ?? 'Unbekannter Fehler');
-}
-
-window.addEventListener('error', (event) => {
-  console.error(event.error ?? event);
-  status.set(`Startfehler: ${errorMessage(event.error ?? event.message)}`, 'error');
+const map = new maplibregl.Map({
+  container: 'map',
+  zoom: 12,
+  center: [11.39085, 47.27574],
+  pitch: 70,
+  hash: true,
+  style: {
+    version: 8,
+    sources: {
+      osm: {
+        type: 'raster',
+        tiles: ['https://a.tile.openstreetmap.org/{z}/{x}/{y}.png'],
+        tileSize: 256,
+        attribution: '&copy; OpenStreetMap Contributors',
+        maxzoom: 19,
+      },
+      terrainSource: {
+        type: 'raster-dem',
+        url: 'https://tiles.mapterhorn.com/tilejson.json',
+      },
+      hillshadeSource: {
+        type: 'raster-dem',
+        url: 'https://tiles.mapterhorn.com/tilejson.json',
+      },
+    },
+    layers: [
+      {
+        id: 'osm',
+        type: 'raster',
+        source: 'osm',
+      },
+      {
+        id: 'hills',
+        type: 'hillshade',
+        source: 'hillshadeSource',
+        layout: { visibility: 'visible' },
+        paint: { 'hillshade-shadow-color': '#473B24' },
+      },
+    ],
+    terrain: {
+      source: 'terrainSource',
+      exaggeration: 1,
+    },
+    sky: {},
+  },
+  maxZoom: 18,
+  maxPitch: 85,
 });
 
-window.addEventListener('unhandledrejection', (event) => {
-  console.error(event.reason);
-  status.set(`Startfehler: ${errorMessage(event.reason)}`, 'error');
+map.addControl(
+  new maplibregl.NavigationControl({
+    visualizePitch: true,
+    showZoom: true,
+    showCompass: true,
+  }),
+);
+
+map.addControl(
+  new maplibregl.TerrainControl({
+    source: 'terrainSource',
+    exaggeration: 1,
+  }),
+);
+
+map.on('load', () => {
+  status.set('MapLibre 3D-Terrain bereit', 'ready');
 });
 
-let map;
-try {
-  status.set('Lade Karte und Terrain …');
-  map = createMap();
-} catch (error) {
+map.on('error', (event) => {
+  const error = event.error ?? event;
   console.error(error);
-  status.set(`Startfehler: ${errorMessage(error)}`, 'error');
-}
-
-function markMapReady() {
-  status.set('MapLibre-Terrain bereit', 'ready');
-}
-
-if (map?.isStyleLoaded()) {
-  markMapReady();
-} else {
-  map?.once('style.load', markMapReady);
-}
-
-map?.on('error', (event) => {
-  console.error(event.error ?? event);
-  status.set(`MapLibre-Fehler: ${errorMessage(event.error ?? event)}`, 'error');
+  status.set(`MapLibre-Fehler: ${error?.message ?? error}`, 'error');
 });
