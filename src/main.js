@@ -23,11 +23,19 @@ const map = new maplibregl.Map({
       },
       terrainSource: {
         type: 'raster-dem',
-        url: 'https://tiles.mapterhorn.com/tilejson.json',
+        tiles: ['https://tiles.mapterhorn.com/{z}/{x}/{y}.webp'],
+        tileSize: 512,
+        encoding: 'terrarium',
+        maxzoom: 17,
+        attribution: 'Terrain: Mapterhorn',
       },
       hillshadeSource: {
         type: 'raster-dem',
-        url: 'https://tiles.mapterhorn.com/tilejson.json',
+        tiles: ['https://tiles.mapterhorn.com/{z}/{x}/{y}.webp'],
+        tileSize: 512,
+        encoding: 'terrarium',
+        maxzoom: 17,
+        attribution: 'Terrain: Mapterhorn',
       },
     },
     layers: [
@@ -50,7 +58,7 @@ const map = new maplibregl.Map({
     },
     sky: {},
   },
-  maxZoom: 18,
+  maxZoom: 17,
   maxPitch: 85,
 });
 
