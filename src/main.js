@@ -40,20 +40,22 @@ async function getNatureData() {
   return createDemoNatureData();
 }
 
-map?.on('load', async () => {
+async function initialize3D() {
   try {
-    status.set('Terrain geladen · erzeuge Vegetation …');
-    await Promise.race([
-      new Promise((resolve) => map.once('idle', resolve)),
-      new Promise((resolve) => setTimeout(resolve, 4000)),
-    ]);
+    status.set('Kartenstil geladen · erzeuge Vegetation …');
     const data = await getNatureData();
     map.addLayer(createNatureLayer({ data, status }));
   } catch (error) {
     console.error(error);
     status.set(`3D-Fehler: ${errorMessage(error)}`, 'error');
   }
-});
+}
+
+if (map?.isStyleLoaded()) {
+  initialize3D();
+} else {
+  map?.once('style.load', initialize3D);
+}
 
 map?.on('error', (event) => {
   console.error(event.error ?? event);
