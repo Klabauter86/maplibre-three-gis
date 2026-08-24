@@ -22,14 +22,6 @@ window.addEventListener('unhandledrejection', (event) => {
 
 let map;
 try {
-  status.set('Prüfe WebGL 2 …');
-  const testCanvas = document.createElement('canvas');
-  const testContext = testCanvas.getContext('webgl2');
-  if (!testContext) {
-    throw new Error('WebGL 2 ist in diesem Browser nicht verfügbar');
-  }
-  testContext.getExtension('WEBGL_lose_context')?.loseContext();
-
   status.set('Lade Karte und Terrain …');
   map = createMap();
 } catch (error) {
@@ -49,10 +41,18 @@ async function getNatureData() {
 }
 
 map?.on('load', async () => {
-  status.set('Terrain geladen · erzeuge Vegetation …');
-  await new Promise((resolve) => map.once('idle', resolve));
-  const data = await getNatureData();
-  map.addLayer(createNatureLayer({ data, status }));
+  try {
+    status.set('Terrain geladen · erzeuge Vegetation …');
+    await Promise.race([
+      new Promise((resolve) => map.once('idle', resolve)),
+      new Promise((resolve) => setTimeout(resolve, 4000)),
+    ]);
+    const data = await getNatureData();
+    map.addLayer(createNatureLayer({ data, status }));
+  } catch (error) {
+    console.error(error);
+    status.set(`3D-Fehler: ${errorMessage(error)}`, 'error');
+  }
 });
 
 map?.on('error', (event) => {
