@@ -1,6 +1,7 @@
 import './styles.css';
 import * as maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import { enableLongPressOrbit } from './interactions/longPressOrbit.js';
 import { createStatus } from './ui/status.js';
 
 const status = createStatus();
@@ -78,9 +79,14 @@ map.addControl(
   }),
 );
 
+enableLongPressOrbit(map, {
+  onStart: () => status.set('Orbit aktiv – zum Stoppen loslassen', 'ready'),
+  onStop: () => status.set('3D bereit · Punkt halten zum Drehen', 'ready'),
+});
+
 map.on('load', () => {
   map.setTerrain({ source: 'terrainSource', exaggeration: 1.5 });
-  status.set('MapLibre 3D-Terrain bereit', 'ready');
+  status.set('3D bereit · Punkt halten zum Drehen', 'ready');
 });
 
 map.on('error', (event) => {
