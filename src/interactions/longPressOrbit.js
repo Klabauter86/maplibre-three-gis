@@ -1,12 +1,15 @@
 const DEFAULT_HOLD_MS = 600;
 const DEFAULT_MOVE_TOLERANCE = 12;
-const DEFAULT_DEGREES_PER_SECOND = 18;
+const DEFAULT_DEAD_ZONE = 8;
+const DEFAULT_SPEED_PER_PIXEL = 0.55;
+const DEFAULT_MAX_SPEED = 120;
 
 export function enableLongPressOrbit(map, options = {}) {
   const holdMs = options.holdMs ?? DEFAULT_HOLD_MS;
   const moveTolerance = options.moveTolerance ?? DEFAULT_MOVE_TOLERANCE;
-  const degreesPerSecond =
-    options.degreesPerSecond ?? DEFAULT_DEGREES_PER_SECOND;
+  const deadZone = options.deadZone ?? DEFAULT_DEAD_ZONE;
+  const speedPerPixel = options.speedPerPixel ?? DEFAULT_SPEED_PER_PIXEL;
+  const maxSpeed = options.maxSpeed ?? DEFAULT_MAX_SPEED;
   const container = map.getCanvasContainer();
 
   let activePointerId = null;
@@ -15,6 +18,7 @@ export function enableLongPressOrbit(map, options = {}) {
   let holdTimer = null;
   let animationFrame = null;
   let lastFrameTime = null;
+  let rotationSpeed = 0;
   let orbiting = false;
   let handlersToRestore = [];
 
@@ -50,10 +54,12 @@ export function enableLongPressOrbit(map, options = {}) {
 
     if (lastFrameTime !== null) {
       const elapsedSeconds = Math.min(time - lastFrameTime, 50) / 1000;
-      map.jumpTo({
-        center: pivot,
-        bearing: map.getBearing() + degreesPerSecond * elapsedSeconds,
-      });
+      if (rotationSpeed !== 0) {
+        map.jumpTo({
+          center: pivot,
+          bearing: map.getBearing() + rotationSpeed * elapsedSeconds,
+        });
+      }
     }
 
     lastFrameTime = time;
@@ -90,6 +96,7 @@ export function enableLongPressOrbit(map, options = {}) {
     startPoint = null;
     pivot = null;
     lastFrameTime = null;
+    rotationSpeed = 0;
   }
 
   function onPointerDown(event) {
@@ -115,6 +122,17 @@ export function enableLongPressOrbit(map, options = {}) {
 
     if (orbiting) {
       event.preventDefault();
+
+      // Up is positive (clockwise), down is negative (counter-clockwise).
+      const verticalDistance = startPoint.y - event.clientY;
+      const effectiveDistance = Math.max(
+        0,
+        Math.abs(verticalDistance) - deadZone,
+      );
+
+      rotationSpeed =
+        Math.sign(verticalDistance) *
+        Math.min(maxSpeed, effectiveDistance * speedPerPixel);
       return;
     }
 
