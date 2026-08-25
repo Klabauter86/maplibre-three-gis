@@ -80,7 +80,8 @@ map.addControl(
 );
 
 enableLongPressOrbit(map, {
-  onStart: () => status.set('Orbit aktiv – zum Stoppen loslassen', 'ready'),
+  onStart: () =>
+    status.set('Orbit aktiv · hoch ↻ · runter ↺ · Abstand = Tempo', 'ready'),
   onStop: () => status.set('3D bereit · Punkt halten zum Drehen', 'ready'),
 });
 
